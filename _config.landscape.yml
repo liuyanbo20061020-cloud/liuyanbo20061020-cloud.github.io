@@ -1,0 +1,37 @@
+# =========================
+# Navigation
+# =========================
+
+menu:
+  首页: /
+  学习: /categories/study/
+  阅读: /categories/reading/
+  电影: /categories/movies/
+  旅行: /categories/travel/
+  归档: /archives/
+
+# =========================
+# Header
+# =========================
+
+subtitle: 'Learning · Reading · Movies · Travel'
+
+links:
+  github: https://github.com/liuyanbo20061020-cloud
+
+# =========================
+# Sidebar
+# =========================
+
+sidebar: right
+
+widgets:
+  - category
+  - tag
+  - archive
+  - recent_posts
+
+archive_type: monthly
+show_count: true
+
+recent_posts_limits: 5

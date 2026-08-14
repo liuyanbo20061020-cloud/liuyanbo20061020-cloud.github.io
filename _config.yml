@@ -3,13 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
+title: Yerbery
+subtitle: 'Learning · Reading · Movies · Travel'
+description: 'Yerbery 的个人学习与生活记录'
 keywords:
-author: John Doe
-language: en
-timezone: ''
+  - Computer Science
+  - Reading
+  - Movies
+  - Travel
+author: Yerbery
+language: zh-CN
+timezone: Asia/Shanghai
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -66,7 +70,13 @@ index_generator:
 
 # Category & Tag
 default_category: uncategorized
+
 category_map:
+  学习: study
+  阅读: reading
+  电影: movies
+  旅行: travel
+
 tag_map:
 
 # Metadata elements
