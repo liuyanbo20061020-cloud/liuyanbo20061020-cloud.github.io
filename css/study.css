@@ -1,0 +1,331 @@
+/* =====================================================
+   Yerbery / STUDY
+   Academic, technical, precise.
+   Body: Times New Roman + CJK serif fallback
+   Math: Cambria Math first, then STIX/Times fallback
+   ===================================================== */
+
+body.realm-study {
+  --study-ink: #10243b;
+  --study-blue: #315f8f;
+  --study-blue-2: #6f91b5;
+  --study-paper: #f7f9fb;
+  --study-paper-2: #ffffff;
+  --study-line: rgba(27, 70, 112, .14);
+  --study-grid: rgba(37, 79, 122, .055);
+  --study-serif: "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+  --study-math: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+  --study-mono: "Cascadia Code", Consolas, "SFMono-Regular", monospace;
+  background:
+    linear-gradient(var(--study-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--study-grid) 1px, transparent 1px),
+    var(--study-paper);
+  background-size: 28px 28px;
+  color: var(--study-ink);
+}
+
+html[data-theme="dark"] body.realm-study {
+  --study-ink: #e9f0f8;
+  --study-blue: #92b9e2;
+  --study-blue-2: #6f91b5;
+  --study-paper: #0d1722;
+  --study-paper-2: #111e2c;
+  --study-line: rgba(150, 190, 230, .16);
+  --study-grid: rgba(128, 168, 207, .045);
+}
+
+body.realm-study .site-header {
+  background: color-mix(in srgb, var(--study-paper) 88%, transparent);
+  border-bottom-color: var(--study-line);
+}
+body.realm-study .brand-name,
+body.realm-study .site-footer strong { font-family: var(--study-serif); }
+body.realm-study .site-nav { font-family: var(--study-serif); }
+body.realm-study .site-nav a::after,
+body.realm-study .reading-progress { background: var(--study-blue); }
+body.realm-study .site-footer { border-color: var(--study-line); }
+
+.study-category-hero {
+  padding: 92px 0 70px;
+  border-bottom: 1px solid var(--study-line);
+}
+.study-category-grid {
+  display: grid;
+  grid-template-columns: 1.12fr .88fr;
+  gap: 72px;
+  align-items: center;
+}
+.study-label,
+.study-doc-id,
+.study-list-head,
+.study-paper-meta,
+.study-article-meta,
+.study-toc-title {
+  font-family: var(--study-mono);
+  text-transform: uppercase;
+  letter-spacing: .13em;
+}
+.study-label { color: var(--study-blue); font-size: 11px; font-weight: 700; }
+.study-category-hero h1 {
+  margin: 12px 0 15px;
+  font: 700 clamp(54px, 8vw, 92px)/.98 var(--study-serif);
+  letter-spacing: -.045em;
+}
+.study-category-hero p {
+  max-width: 700px;
+  margin: 0;
+  font: 400 18px/1.85 var(--study-serif);
+  color: color-mix(in srgb, var(--study-ink) 67%, transparent);
+}
+.study-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 26px;
+  font: 700 11px/1.4 var(--study-mono);
+  letter-spacing: .08em;
+  color: var(--study-blue);
+}
+.study-stat-row strong { font-size: 16px; }
+
+.study-hero-board {
+  position: relative;
+  min-height: 230px;
+  padding: 30px;
+  border: 1px solid var(--study-line);
+  background:
+    linear-gradient(rgba(49,95,143,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(49,95,143,.06) 1px, transparent 1px),
+    var(--study-paper-2);
+  background-size: 21px 21px;
+  box-shadow: 14px 14px 0 color-mix(in srgb, var(--study-blue) 7%, transparent);
+  overflow: hidden;
+}
+.study-hero-board > span {
+  position: absolute;
+  right: 24px;
+  top: 15px;
+  font: 700 74px/1 var(--study-serif);
+  color: color-mix(in srgb, var(--study-blue) 16%, transparent);
+}
+.study-hero-board code {
+  position: absolute;
+  left: 28px;
+  top: 82px;
+  font: 15px/1.6 var(--study-mono);
+  color: var(--study-ink);
+}
+.study-board-rule { position: absolute; left: 28px; right: 28px; bottom: 55px; height: 1px; background: var(--study-line); }
+.study-hero-board small { position: absolute; left: 28px; bottom: 25px; font: 700 10px/1 var(--study-mono); letter-spacing: .14em; color: var(--study-blue); }
+
+.study-list { padding: 50px 0 100px; }
+.study-list-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--study-ink);
+  color: var(--study-blue);
+  font-size: 10px;
+  font-weight: 700;
+}
+.study-paper-card {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 28px;
+  padding: 34px 0;
+  border-bottom: 1px solid var(--study-line);
+}
+.study-paper-no {
+  font: 700 35px/1 var(--study-serif);
+  color: color-mix(in srgb, var(--study-blue) 38%, transparent);
+}
+.study-paper-meta { display: flex; flex-wrap: wrap; gap: 14px 22px; font-size: 10px; color: var(--study-blue); }
+.study-paper-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.study-paper-tags em { font-style: normal; }
+.study-paper-body h2 {
+  margin: 10px 0 10px;
+  font: 700 30px/1.28 var(--study-serif);
+  letter-spacing: -.015em;
+}
+.study-paper-body h2 a:hover { color: var(--study-blue); }
+.study-paper-body > p {
+  max-width: 790px;
+  margin: 0 0 15px;
+  font: 400 16px/1.8 var(--study-serif);
+  color: color-mix(in srgb, var(--study-ink) 70%, transparent);
+}
+.study-open { font: 700 10px/1 var(--study-mono); letter-spacing: .12em; color: var(--study-blue); }
+
+.study-article-header {
+  padding: 86px 0 42px;
+  border-bottom: 2px solid var(--study-ink);
+}
+.study-doc-id { color: var(--study-blue); font-size: 10px; font-weight: 700; }
+.study-article-header h1 {
+  max-width: 980px;
+  margin: 18px 0 18px;
+  font: 700 clamp(44px, 6.2vw, 76px)/1.08 var(--study-serif);
+  letter-spacing: -.04em;
+}
+.study-abstract {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 24px;
+  max-width: 920px;
+  padding: 18px 0 8px;
+}
+.study-abstract > span { font: 700 10px/1.4 var(--study-mono); letter-spacing: .12em; color: var(--study-blue); padding-top: 6px; }
+.study-abstract p { margin: 0; font: italic 16px/1.75 var(--study-serif); color: color-mix(in srgb, var(--study-ink) 72%, transparent); }
+.study-article-meta { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 24px; font-size: 10px; color: color-mix(in srgb, var(--study-ink) 62%, transparent); }
+.study-tagline { color: var(--study-blue); }
+
+.study-article-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 820px);
+  justify-content: center;
+  gap: 64px;
+  align-items: start;
+  padding-top: 48px;
+}
+.study-toc {
+  position: sticky;
+  top: 108px;
+  padding: 16px 0 12px;
+  border-top: 2px solid var(--study-ink);
+  border-bottom: 1px solid var(--study-line);
+}
+.study-toc-title { margin-bottom: 14px; font-size: 10px; font-weight: 700; color: var(--study-blue); }
+.study-toc nav { display: grid; gap: 7px; }
+.study-toc a {
+  display: block;
+  padding-left: 10px;
+  border-left: 1px solid var(--study-line);
+  font: 400 12px/1.45 var(--study-serif);
+  color: color-mix(in srgb, var(--study-ink) 62%, transparent);
+}
+.study-toc a[data-level="3"] { padding-left: 22px; font-size: 11px; }
+.study-toc a:hover { color: var(--study-blue); border-color: var(--study-blue); }
+.study-toc.is-empty { display: none; }
+
+.study-content {
+  padding-top: 0;
+  font-family: var(--study-serif);
+  font-size: 17px;
+  line-height: 1.9;
+}
+.study-content h2 {
+  counter-increment: study-h2;
+  margin: 2.4em 0 .85em;
+  padding-bottom: .38em;
+  border-bottom: 1px solid var(--study-line);
+  font: 700 31px/1.25 var(--study-serif);
+}
+.study-content h3 { margin: 1.9em 0 .7em; font: 700 23px/1.35 var(--study-serif); }
+.study-content h4 { margin: 1.6em 0 .5em; font: 700 18px/1.4 var(--study-serif); }
+.study-content p, .study-content li, .study-content td, .study-content th { font-family: var(--study-serif); }
+.study-content strong { font-weight: 700; }
+.study-content a { color: var(--study-blue); }
+.study-content code {
+  font-family: var(--study-mono);
+  font-size: .86em;
+  background: color-mix(in srgb, var(--study-blue) 7%, var(--study-paper-2));
+  border-color: var(--study-line);
+}
+.study-content pre {
+  position: relative;
+  background: #0b1724;
+  border: 1px solid rgba(144,190,232,.18);
+  border-radius: 4px;
+  color: #e8f2fb;
+  font-family: var(--study-mono);
+  box-shadow: none;
+}
+.study-content pre::before {
+  content: "CODE";
+  position: absolute;
+  right: 13px;
+  top: 10px;
+  font: 700 9px/1 var(--study-mono);
+  letter-spacing: .16em;
+  color: rgba(199,224,246,.48);
+}
+.study-content blockquote {
+  border-left: 3px solid var(--study-blue);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--study-blue) 5%, var(--study-paper-2));
+  color: color-mix(in srgb, var(--study-ink) 72%, transparent);
+  font-style: italic;
+}
+.study-content table { width: 100%; border-collapse: collapse; margin: 1.8em 0; font-size: 15px; }
+.study-content th, .study-content td { padding: 10px 12px; border: 1px solid var(--study-line); text-align: left; }
+.study-content th { background: color-mix(in srgb, var(--study-blue) 7%, var(--study-paper-2)); }
+.study-content img { border-radius: 4px; box-shadow: 0 10px 32px rgba(27,70,112,.08); }
+.study-content hr { border-color: var(--study-line); }
+
+/* reusable academic callouts in Markdown via raw HTML */
+.study-content .definition,
+.study-content .theorem,
+.study-content .proof,
+.study-content .example,
+.study-content .academic-note {
+  position: relative;
+  margin: 1.8em 0;
+  padding: 20px 22px 18px;
+  border: 1px solid var(--study-line);
+  background: var(--study-paper-2);
+}
+.study-content .definition::before,
+.study-content .theorem::before,
+.study-content .proof::before,
+.study-content .example::before,
+.study-content .academic-note::before {
+  display: block;
+  margin-bottom: 9px;
+  font: 700 10px/1 var(--study-mono);
+  letter-spacing: .14em;
+  color: var(--study-blue);
+}
+.study-content .definition::before { content: "DEFINITION"; }
+.study-content .theorem::before { content: "THEOREM"; }
+.study-content .proof::before { content: "PROOF"; }
+.study-content .example::before { content: "EXAMPLE"; }
+.study-content .academic-note::before { content: "NOTE"; }
+
+/* Formula typography: native MathML follows Cambria Math where available.
+   MathJax CHTML keeps its own glyph metrics, but the container is aligned
+   to the same serif/math stack for surrounding labels and fallback text. */
+.study-content math,
+.study-content .math,
+.study-content .equation,
+.study-content mjx-container {
+  font-family: var(--study-math) !important;
+}
+.study-content mjx-container[display="true"] {
+  margin: 1.6em 0 !important;
+  padding: 14px 12px;
+  overflow-x: auto;
+  border-top: 1px solid var(--study-line);
+  border-bottom: 1px solid var(--study-line);
+  background: color-mix(in srgb, var(--study-blue) 3%, transparent);
+}
+.study-tags { border-color: var(--study-line); }
+body.realm-study .realm-post-nav { border-color: var(--study-line); font-family: var(--study-serif); }
+body.realm-study .realm-post-nav a { font-family: var(--study-serif); }
+
+@media (max-width: 980px) {
+  .study-category-grid { grid-template-columns: 1fr; gap: 38px; }
+  .study-article-layout { grid-template-columns: 1fr; }
+  .study-toc { position: relative; top: auto; max-width: 820px; width: 100%; margin: 0 auto; }
+  .study-content { max-width: 820px; width: 100%; margin: 0 auto; }
+}
+
+@media (max-width: 640px) {
+  .study-category-hero { padding: 58px 0 46px; }
+  .study-hero-board { min-height: 180px; }
+  .study-paper-card { grid-template-columns: 48px 1fr; gap: 16px; }
+  .study-paper-no { font-size: 27px; }
+  .study-paper-body h2 { font-size: 25px; }
+  .study-abstract { grid-template-columns: 1fr; gap: 7px; }
+  .study-article-header { padding-top: 58px; }
+}

@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light" data-realm="study">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f0">
+  <meta name="description" content="&lt;p&gt;IEEE 754 是计算机中表示&lt;strong&gt;浮点数&lt;/strong&gt;的一套标准。像 &lt;code&gt;0.1&lt;/code&gt;、&lt;code&gt;3.1415926&lt;/code&gt;、&lt;code&gt;-0.25&lt;/code&gt;&lt;br&gt;这样的数字无法像普通整数一样直接保存，因此计算机采用一种类似&lt;strong&gt;科学计数法&lt;/strong&gt;的方法表示它们。&lt;/p&gt;
+&lt;p&gt;本文主要介绍 IEEE 754 的基本结构、符号位、指数与偏置、尾数，以及十进制与 IEEE 754&lt;br&gt;表示之间的转换方法。&lt;/p&gt;">
+  <title>IEEE 754 浮点数学习笔记 · Yerbery</title>
+  
+<link rel="stylesheet" href="/css/yerbery.css">
+
+  
+<link rel="stylesheet" href="/css/study.css">
+
+  
+  
+  
+
+  
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body class="realm-study">
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <header class="site-header" id="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="/" aria-label="返回首页">
+        <span class="brand-mark">Y</span>
+        <span class="brand-name">Yerbery</span>
+      </a>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="打开菜单" aria-expanded="false">☰</button>
+
+      <nav class="site-nav" id="site-nav">
+        
+          <a href="/">首页</a>
+        
+          <a href="/categories/study/">学习</a>
+        
+          <a href="/categories/reading/">阅读</a>
+        
+          <a href="/categories/movies/">电影</a>
+        
+          <a href="/categories/travel/">旅行</a>
+        
+          <a href="/archives/">归档</a>
+        
+      </nav>
+
+      <div class="nav-actions">
+        
+          <a class="nav-icon" href="https://github.com/liuyanbo20061020-cloud" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
+        
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换深浅色">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="site-main">
+    
+
+
+  <article class="study-article">
+    <header class="study-article-header shell">
+      <div class="study-doc-id">YERBERY STUDY NOTE · 20260814</div>
+      <h1>IEEE 754 浮点数学习笔记</h1>
+      
+      <div class="study-article-meta">
+        <span>Published 2026.08.14</span>
+        <span>9 min read</span>
+        
+          <span class="study-tagline">#计算机组成 #IEEE754 #二进制 </span>
+        
+      </div>
+    </header>
+
+    <div class="study-article-layout shell">
+      <aside class="study-toc" id="study-toc">
+        <div class="study-toc-title">CONTENTS</div>
+        <nav id="study-toc-list"></nav>
+      </aside>
+      <div class="article-content study-content" id="article-content">
+        <p>IEEE 754 是计算机中表示<strong>浮点数</strong>的一套标准。像 <code>0.1</code>、<code>3.1415926</code>、<code>-0.25</code><br>这样的数字无法像普通整数一样直接保存，因此计算机采用一种类似<strong>科学计数法</strong>的方法表示它们。</p>
+<p>本文主要介绍 IEEE 754 的基本结构、符号位、指数与偏置、尾数，以及十进制与 IEEE 754<br>表示之间的转换方法。</p>
+<span id="more"></span>
+
+<p>例如十进制科学计数法：</p>
+<p>$$<br>123.4 &#x3D; 1.234 \times 10^2<br>$$</p>
+<p>二进制也可以采用类似形式：</p>
+<p>$$<br>101.11 &#x3D; 1.0111 \times 2^2<br>$$</p>
+<p>因此，一个浮点数本质上需要记录三类信息：</p>
+<p><strong>符号、有效数字和指数。</strong></p>
+<h2 id="1-IEEE-754-的结构"><a href="#1-IEEE-754-的结构" class="headerlink" title="1. IEEE 754 的结构"></a>1. IEEE 754 的结构</h2><p>最常见的 IEEE 754 浮点格式是单精度 <code>float</code> 和双精度 <code>double</code>。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th align="right">总位数</th>
+<th align="right">符号位 S</th>
+<th align="right">指数 E</th>
+<th align="right">尾数 F</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>float</code></td>
+<td align="right">32</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">23</td>
+</tr>
+<tr>
+<td><code>double</code></td>
+<td align="right">64</td>
+<td align="right">1</td>
+<td align="right">11</td>
+<td align="right">52</td>
+</tr>
+</tbody></table>
+<p>以 32 位 <code>float</code> 为例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">┌───────┬──────────────┬─────────────────────────┐</span><br><span class="line">│ S 1位 │    E 8位     │        F 23位           │</span><br><span class="line">└───────┴──────────────┴─────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>三个部分分别负责：</p>
+<ul>
+<li><strong>S（Sign）</strong>：表示正负；</li>
+<li><strong>E（Exponent）</strong>：保存指数，决定数值范围；</li>
+<li><strong>F（Fraction）</strong>：保存有效数字，决定精度。</li>
+</ul>
+<hr>
+<h2 id="2-符号位-S"><a href="#2-符号位-S" class="headerlink" title="2. 符号位 S"></a>2. 符号位 S</h2><p>符号位只需要一位：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S = 0 → 正数</span><br><span class="line">S = 1 → 负数</span><br></pre></td></tr></table></figure>
+
+<p>因此符号可以表示为：</p>
+<p>$$<br>(-1)^S<br>$$</p>
+<p>当 $S&#x3D;0$ 时结果为正，当 $S&#x3D;1$ 时结果为负。</p>
+<hr>
+<h2 id="3-尾数-F-与隐藏位"><a href="#3-尾数-F-与隐藏位" class="headerlink" title="3. 尾数 F 与隐藏位"></a>3. 尾数 F 与隐藏位</h2><p>假设有：</p>
+<p>$$<br>5.75 &#x3D; 101.11<br>$$</p>
+<p>将它写成二进制科学计数法：</p>
+<p>$$<br>101.11 &#x3D; 1.0111 \times 2^2<br>$$</p>
+<p>对于正常的二进制浮点数，规格化之后都会具有：</p>
+<p>$$<br>1.xxx \times 2^e<br>$$</p>
+<p>这样的形式。</p>
+<p>也就是说，最前面的 <code>1</code> 是确定存在的，因此 IEEE 754 不需要真正把它保存下来，只保存小数点后面的部分。</p>
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.0111</span><br></pre></td></tr></table></figure>
+
+<p>实际只保存：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0111...</span><br></pre></td></tr></table></figure>
+
+<p>最前面的这个 <code>1</code> 称为<strong>隐藏位（Hidden Bit）</strong>。</p>
+<p>因此，单精度 <code>float</code> 虽然只保存 23 位 Fraction，但正常情况下实际上拥有：</p>
+<p>$$<br>1+23&#x3D;24<br>$$</p>
+<p>位二进制有效数字。</p>
+<hr>
+<h2 id="4-指数-E-与-Bias"><a href="#4-指数-E-与-Bias" class="headerlink" title="4. 指数 E 与 Bias"></a>4. 指数 E 与 Bias</h2><p>指数既可能为正，也可能为负。</p>
+<p>例如：</p>
+<p>$$<br>0.00101 &#x3D; 1.01 \times 2^{-3}<br>$$</p>
+<p>此时实际指数为：</p>
+<p>$$<br>e&#x3D;-3<br>$$</p>
+<p>IEEE 754 并不直接存储这个指数，而是使用一个<strong>偏置值 Bias</strong>。</p>
+<p>设：</p>
+<ul>
+<li>$e$ 为实际指数；</li>
+<li>$E$ 为计算机真正存储的指数。</li>
+</ul>
+<p>那么：</p>
+<p>$$<br>E&#x3D;e+\mathrm{Bias}<br>$$</p>
+<p>反过来：</p>
+<p>$$<br>e&#x3D;E-\mathrm{Bias}<br>$$</p>
+<p>Bias 的计算方法为：</p>
+<p>$$<br>\mathrm{Bias}&#x3D;2^{k-1}-1<br>$$</p>
+<p>其中 $k$ 为指数所占的位数。</p>
+<p>因此：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">float  ：Bias = 127</span><br><span class="line">double ：Bias = 1023</span><br></pre></td></tr></table></figure>
+
+<p>对于单精度 <code>float</code>：</p>
+<p>$$<br>e&#x3D;E-127<br>$$</p>
+<hr>
+<h2 id="5-IEEE-754-的核心公式"><a href="#5-IEEE-754-的核心公式" class="headerlink" title="5. IEEE 754 的核心公式"></a>5. IEEE 754 的核心公式</h2><p>对于普通的规格化浮点数：</p>
+<p>$$<br>V&#x3D;(-1)^S \times (1.F) \times 2^{E-\mathrm{Bias}}<br>$$</p>
+<p>对于 32 位单精度 <code>float</code>：</p>
+<p>$$<br>\boxed{<br>V&#x3D;(-1)^S \times (1.F) \times 2^{E-127}<br>}<br>$$</p>
+<p>这里：</p>
+<ul>
+<li>$S$ 决定正负；</li>
+<li>$E$ 决定指数；</li>
+<li>$1.F$ 表示补回隐藏的 <code>1</code> 后得到的有效数字。</li>
+</ul>
+<p>这就是 IEEE 754 最核心的公式。</p>
+<hr>
+<h2 id="6-十进制数转换为-IEEE-754"><a href="#6-十进制数转换为-IEEE-754" class="headerlink" title="6. 十进制数转换为 IEEE 754"></a>6. 十进制数转换为 IEEE 754</h2><p>以十进制：</p>
+<p>$$<br>5.75<br>$$</p>
+<p>为例，将其转换为 32 位单精度浮点数。</p>
+<h3 id="第一步：确定符号位"><a href="#第一步：确定符号位" class="headerlink" title="第一步：确定符号位"></a>第一步：确定符号位</h3><p>因为 $5.75$ 是正数：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S = 0</span><br></pre></td></tr></table></figure>
+
+<h3 id="第二步：转换为二进制"><a href="#第二步：转换为二进制" class="headerlink" title="第二步：转换为二进制"></a>第二步：转换为二进制</h3><p>整数部分：</p>
+<p>$$<br>5 &#x3D; 101<br>$$</p>
+<p>小数部分：</p>
+<p>$$<br>0.75 &#x3D; 0.11<br>$$</p>
+<p>因此：</p>
+<p>$$<br>5.75 &#x3D; 101.11<br>$$</p>
+<h3 id="第三步：规格化"><a href="#第三步：规格化" class="headerlink" title="第三步：规格化"></a>第三步：规格化</h3><p>将小数点移动到最高有效位之后：</p>
+<p>$$<br>101.11 &#x3D; 1.0111 \times 2^2<br>$$</p>
+<p>因此实际指数：</p>
+<p>$$<br>e&#x3D;2<br>$$</p>
+<h3 id="第四步：计算指数-E"><a href="#第四步：计算指数-E" class="headerlink" title="第四步：计算指数 E"></a>第四步：计算指数 E</h3><p>对于 <code>float</code>：</p>
+<p>$$<br>E&#x3D;e+127<br>$$</p>
+<p>所以：</p>
+<p>$$<br>E&#x3D;2+127&#x3D;129<br>$$</p>
+<p>129 转换成 8 位二进制为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10000001</span><br></pre></td></tr></table></figure>
+
+<p>因此：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">E = 10000001</span><br></pre></td></tr></table></figure>
+
+<h3 id="第五步：确定尾数-F"><a href="#第五步：确定尾数-F" class="headerlink" title="第五步：确定尾数 F"></a>第五步：确定尾数 F</h3><p>规格化后的有效数字是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.0111</span><br></pre></td></tr></table></figure>
+
+<p>去掉隐藏的 <code>1</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0111</span><br></pre></td></tr></table></figure>
+
+<p>补足 23 位：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">01110000000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>最终：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S │    E     │           F</span><br><span class="line">0 │ 10000001 │ 01110000000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>即：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">01000000101110000000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>转换成十六进制：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x40B80000</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-IEEE-754-转换回十进制"><a href="#7-IEEE-754-转换回十进制" class="headerlink" title="7. IEEE 754 转换回十进制"></a>7. IEEE 754 转换回十进制</h2><p>反过来，假设得到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0 10000010 10100000000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>首先看符号位：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S = 0</span><br></pre></td></tr></table></figure>
+
+<p>因此结果为正数。</p>
+<p>指数部分：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10000010</span><br></pre></td></tr></table></figure>
+
+<p>转换为十进制：</p>
+<p>$$<br>E&#x3D;130<br>$$</p>
+<p>所以实际指数：</p>
+<p>$$<br>e&#x3D;130-127&#x3D;3<br>$$</p>
+<p>尾数部分：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10100000000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>补回隐藏的 <code>1</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.101</span><br></pre></td></tr></table></figure>
+
+<p>它对应的十进制值为：</p>
+<p>$$<br>1+\frac{1}{2}+\frac{1}{8}&#x3D;1.625<br>$$</p>
+<p>最后乘上指数：</p>
+<p>$$<br>1.625 \times 2^3&#x3D;13<br>$$</p>
+<p>所以这个 IEEE 754 浮点数表示：</p>
+<p>$$<br>\boxed{13}<br>$$</p>
+<hr>
+<h2 id="8-特殊值"><a href="#8-特殊值" class="headerlink" title="8. 特殊值"></a>8. 特殊值</h2><p>前面的公式只适用于普通的<strong>规格化数 Normalized Number</strong>。</p>
+<p>IEEE 754 还利用特殊的指数编码表示 <code>0</code>、无穷大和 <code>NaN</code>。</p>
+<h3 id="E-既不全为-0，也不全为-1"><a href="#E-既不全为-0，也不全为-1" class="headerlink" title="E 既不全为 0，也不全为 1"></a>E 既不全为 0，也不全为 1</h3><p>这是普通规格化数：</p>
+<p>$$<br>V&#x3D;(-1)^S \times (1.F) \times 2^{E-127}<br>$$</p>
+<h3 id="E-全为-0"><a href="#E-全为-0" class="headerlink" title="E 全为 0"></a>E 全为 0</h3><p>如果指数为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">00000000</span><br></pre></td></tr></table></figure>
+
+<p>则需要继续观察 Fraction。</p>
+<p>如果 <code>F = 0</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+0 或 -0</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>F ≠ 0</code>，表示<strong>非规格化数（Subnormal Number）</strong>。</p>
+<p>此时不存在隐藏的 <code>1</code>，而是使用：</p>
+<p>$$<br>V&#x3D;(-1)^S \times (0.F) \times 2^{-126}<br>$$</p>
+<p>Subnormal 用来表示非常接近 0 的数字。</p>
+<h3 id="E-全为-1"><a href="#E-全为-1" class="headerlink" title="E 全为 1"></a>E 全为 1</h3><p>如果指数为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">11111111</span><br></pre></td></tr></table></figure>
+
+<p>同样继续观察 Fraction。</p>
+<p>如果 <code>F = 0</code>：</p>
+<p>$$<br>+\infty \quad \text{或} \quad -\infty<br>$$</p>
+<p>如果 <code>F ≠ 0</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NaN</span><br></pre></td></tr></table></figure>
+
+<p>即 <strong>Not a Number</strong>。</p>
+<p>总结：</p>
+<table>
+<thead>
+<tr>
+<th>E</th>
+<th>F</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全 0</td>
+<td>全 0</td>
+<td>±0</td>
+</tr>
+<tr>
+<td>全 0</td>
+<td>非 0</td>
+<td>Subnormal</td>
+</tr>
+<tr>
+<td>普通值</td>
+<td>任意</td>
+<td>Normal</td>
+</tr>
+<tr>
+<td>全 1</td>
+<td>全 0</td>
+<td>±∞</td>
+</tr>
+<tr>
+<td>全 1</td>
+<td>非 0</td>
+<td>NaN</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="9-为什么浮点数会产生误差？"><a href="#9-为什么浮点数会产生误差？" class="headerlink" title="9. 为什么浮点数会产生误差？"></a>9. 为什么浮点数会产生误差？</h2><p>并不是所有十进制小数都能够用有限位二进制精确表示。</p>
+<p>例如：</p>
+<p>$$<br>0.5 &#x3D; 0.1_{\mathrm{binary}}<br>$$</p>
+<p>可以有限表示。</p>
+<p>但是十进制 <code>0.1</code> 转换为二进制后会不断循环：</p>
+<p>$$<br>0.000110011001100110011\cdots<br>$$</p>
+<p>而计算机能够保存的位数有限，因此只能保存一个近似值。</p>
+<p>所以计算机中存储的 <code>0.1</code> 并不是数学意义上完全精确的 <code>0.1</code>，而是一个非常接近它的二进制浮点数。</p>
+<p>这也是为什么程序中有时会出现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0.1 + 0.2 ≠ 0.3</span><br></pre></td></tr></table></figure>
+
+<p>这种现象。</p>
+<p>因此在程序中，一般不直接使用：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a == b</span><br></pre></td></tr></table></figure>
+
+<p>判断两个浮点数是否相等，而是比较两者之间的误差：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">fabs</span>(a - b) &lt; <span class="number">1e-9</span></span><br></pre></td></tr></table></figure>
+
+<p>也就是判断：</p>
+<p>$$<br>|a-b|&lt;\varepsilon<br>$$</p>
+<p>其中 $\varepsilon$ 表示允许的误差。</p>
+<hr>
+<h2 id="10-精度与表示范围"><a href="#10-精度与表示范围" class="headerlink" title="10. 精度与表示范围"></a>10. 精度与表示范围</h2><p>IEEE 754 中有一个很重要的区别：</p>
+<blockquote>
+<p><strong>Exponent 主要决定表示范围，Fraction 主要决定表示精度。</strong></p>
+</blockquote>
+<p>单精度 <code>float</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">23 位 Fraction</span><br><span class="line">+ 1 位隐藏位</span><br><span class="line">= 24 位有效二进制数字</span><br></pre></td></tr></table></figure>
+
+<p>大约能够提供 <strong>6～7 位十进制有效数字</strong>。</p>
+<p>双精度 <code>double</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">52 位 Fraction</span><br><span class="line">+ 1 位隐藏位</span><br><span class="line">= 53 位有效二进制数字</span><br></pre></td></tr></table></figure>
+
+<p>大约能够提供 <strong>15～16 位十进制有效数字</strong>。</p>
+<p>因此 <code>double</code> 通常具有比 <code>float</code> 更高的计算精度。</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>IEEE 754 的核心思想其实并不复杂：</p>
+<p>先把一个二进制数写成类似科学计数法的形式：</p>
+<p>$$<br>1.xxx \times 2^e<br>$$</p>
+<p>然后分别保存：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">S → 符号</span><br><span class="line">E → 指数</span><br><span class="line">F → 有效数字</span><br></pre></td></tr></table></figure>
+
+<p>对于普通的单精度浮点数：</p>
+<p>$$<br>\boxed{<br>V&#x3D;(-1)^S \times (1.F) \times 2^{E-127}<br>}<br>$$</p>
+<p>十进制转换为 IEEE 754 时，可以按照：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">十进制数</span><br><span class="line">   ↓</span><br><span class="line">转换为二进制</span><br><span class="line">   ↓</span><br><span class="line">规格化为 1.xxx × 2^e</span><br><span class="line">   ↓</span><br><span class="line">确定符号位 S</span><br><span class="line">   ↓</span><br><span class="line">计算 E = e + 127</span><br><span class="line">   ↓</span><br><span class="line">去掉隐藏的 1 得到 F</span><br><span class="line">   ↓</span><br><span class="line">拼接 S + E + F</span><br></pre></td></tr></table></figure>
+
+<p>最后额外记住：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E 全 0 → Zero / Subnormal</span><br><span class="line">E 全 1 → Infinity / NaN</span><br></pre></td></tr></table></figure>
+
+<p>掌握这些内容，就已经完整掌握了 IEEE 754 单精度浮点数最核心的表示与转换方法。</p>
+
+      </div>
+    </div>
+
+    
+      <div class="article-tags study-tags shell narrow">
+        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90/"># 计算机组成</a><a href="/tags/IEEE754/"># IEEE754</a><a href="/tags/%E4%BA%8C%E8%BF%9B%E5%88%B6/"># 二进制</a>
+      </div>
+    
+  </article>
+
+
+
+<nav class="post-nav realm-post-nav shell narrow">
+  <div>
+    <span>上一篇</span><a href="/2026/08/14/%E8%8A%B1%E6%9C%AA%E7%9C%A0-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">《花未眠》：在凌晨四点，重新学习看见</a>
+  </div>
+  <div class="post-nav-next">
+    
+  </div>
+</nav>
+
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Yerbery</strong>
+      <span> · Stay curious. Stay gentle.</span>
+    </div>
+    <div>© <span id="current-year"></span> Yerbery</div>
+  </footer>
+
+  
+<script src="/js/yerbery.js"></script>
+
+</body>
+</html>
