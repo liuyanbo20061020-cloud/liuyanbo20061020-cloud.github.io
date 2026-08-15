@@ -1,0 +1,24 @@
+brand: Yerbery
+kicker: PERSONAL GARDEN
+motto: 把知识、书页、银幕与远方，慢慢收进同一个地方。
+intro: Learning · Reading · Movies · Travel
+
+menu:
+  首页: /
+  学习: /categories/study/
+  阅读: /categories/reading/
+  电影: /categories/movies/
+  旅行: /categories/travel/
+  归档: /archives/
+
+# 阅读板块的五种视觉子类型。
+# 文章 front matter 使用 reading_type: mystery / fiction / essay / travelogue / other
+reading_types:
+  mystery: 悬疑
+  fiction: 文学·小说
+  essay: 文学·散文&随笔
+  travelogue: 游阅
+  other: 其他
+
+github: https://github.com/liuyanbo20061020-cloud
+footer_text: Stay curious. Stay gentle.

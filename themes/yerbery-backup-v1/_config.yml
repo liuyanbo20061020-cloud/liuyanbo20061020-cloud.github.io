@@ -1,0 +1,15 @@
+brand: Yerbery
+kicker: PERSONAL GARDEN
+motto: 把知识、书页、银幕与远方，慢慢收进同一个地方。
+intro: Learning · Reading · Movies · Travel
+
+menu:
+  首页: /
+  学习: /categories/study/
+  阅读: /categories/reading/
+  电影: /categories/movies/
+  旅行: /categories/travel/
+  归档: /archives/
+
+github: https://github.com/liuyanbo20061020-cloud
+footer_text: Stay curious. Stay gentle.

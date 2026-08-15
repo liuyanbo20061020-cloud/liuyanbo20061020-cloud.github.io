@@ -1,0 +1,192 @@
+<%
+  var metas = {
+    '学习': { en: 'ACADEMIC NOTEBOOK', desc: '把复杂问题拆开、证明、实现，再把结论写成可以复用的知识。' },
+    '阅读': { en: 'READING ROOM', desc: '让不同类型的书拥有不同的气味，但都保留安静、克制和个人判断。' },
+    '电影': { en: 'CINEMA LOG', desc: '不做资料库，只留下银幕熄灭之后，仍值得回想的画面与情绪。' },
+    '旅行': { en: 'TRAVEL JOURNAL', desc: '把城市、路线、天气与照片收进明亮的旅行档案。' }
+  };
+  var meta = metas[page.category] || { en: 'CATEGORY', desc: '这一类文章的集合。' };
+  var posts = page.posts && page.posts.toArray ? page.posts.toArray() : [];
+  function plainText(html) { return String(html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
+  function postSummary(post, len) {
+    var text = plainText(post.excerpt || post.content);
+    return text.length > len ? text.slice(0, len) + '…' : text;
+  }
+  var readingTypes = theme.reading_types || {
+    mystery: '悬疑', fiction: '文学·小说', essay: '文学·散文&随笔', travelogue: '游阅', other: '其他'
+  };
+%>
+
+<% if (page.category === '学习') { %>
+  <section class="study-category-hero">
+    <div class="shell study-category-grid">
+      <div>
+        <div class="study-label">YERBERY / <%= meta.en %></div>
+        <h1>学习</h1>
+        <p><%= meta.desc %></p>
+        <div class="study-stat-row">
+          <span><strong><%= posts.length %></strong> NOTES</span>
+          <span>CS · SYSTEM · ALGORITHM · AI</span>
+        </div>
+      </div>
+      <div class="study-hero-board" aria-hidden="true">
+        <span>01</span>
+        <code>while (curious) { learn(); }</code>
+        <div class="study-board-rule"></div>
+        <small>REASON → VERIFY → WRITE</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="study-list shell">
+    <div class="study-list-head">
+      <span>INDEX / <%= String(posts.length).padStart(2, '0') %></span>
+      <span>ORDERED BY DATE ↓</span>
+    </div>
+    <% posts.forEach(function(post, i) { %>
+      <article class="study-paper-card">
+        <div class="study-paper-no"><%= String(i + 1).padStart(2, '0') %></div>
+        <div class="study-paper-body">
+          <div class="study-paper-meta">
+            <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+            <% if (post.tags && post.tags.length) { %>
+              <span class="study-paper-tags">
+                <% post.tags.each(function(tag) { %><em><%= tag.name %></em><% }) %>
+              </span>
+            <% } %>
+          </div>
+          <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+          <p><%= postSummary(post, 170) %></p>
+          <a class="study-open" href="<%= url_for(post.path) %>">OPEN NOTE →</a>
+        </div>
+      </article>
+    <% }) %>
+  </section>
+
+<% } else if (page.category === '阅读') { %>
+  <section class="reading-category-hero shell narrow">
+    <div class="reading-masthead">YERBERY · READING ROOM</div>
+    <h1>阅读</h1>
+    <p><%= meta.desc %></p>
+    <div class="reading-ornament" aria-hidden="true"><span></span><b>✦</b><span></span></div>
+  </section>
+
+  <section class="reading-library shell">
+    <div class="reading-filter" id="reading-filter" aria-label="阅读类型筛选">
+      <button class="is-active" data-reading-filter="all">全部</button>
+      <% Object.keys(readingTypes).forEach(function(key) { %>
+        <button data-reading-filter="<%= key %>"><%= readingTypes[key] %></button>
+      <% }) %>
+    </div>
+
+    <div class="reading-grid" id="reading-grid">
+      <% posts.forEach(function(post, i) {
+        var type = post.reading_type && readingTypes[post.reading_type] ? post.reading_type : 'other';
+      %>
+        <article class="reading-card reading-card-<%= type %>" data-reading-type="<%= type %>">
+          <div class="reading-card-top">
+            <span class="reading-genre"><%= readingTypes[type] %></span>
+            <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+          </div>
+          <div class="reading-card-quote" aria-hidden="true">“</div>
+          <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+          <p><%= postSummary(post, 145) %></p>
+          <div class="reading-card-foot">
+            <span>No. <%= String(i + 1).padStart(2, '0') %></span>
+            <a href="<%= url_for(post.path) %>">翻开这一页 →</a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </section>
+
+<% } else if (page.category === '电影') { %>
+  <section class="movie-category-hero">
+    <div class="shell movie-hero-inner">
+      <div class="movie-signal">YERBERY / <%= meta.en %></div>
+      <h1>电影</h1>
+      <p><%= meta.desc %></p>
+      <div class="movie-coordinates">FRAME · SOUND · MEMORY · AFTERGLOW</div>
+    </div>
+  </section>
+
+  <section class="movie-log shell">
+    <% posts.forEach(function(post, i) { %>
+      <article class="movie-card">
+        <div class="movie-card-index"><%= String(i + 1).padStart(2, '0') %></div>
+        <div class="movie-card-beam" aria-hidden="true"></div>
+        <div class="movie-card-meta">
+          <span><%= post.movie_year || date(post.date, 'YYYY') %></span>
+          <% if (post.director) { %><span>DIR. <%= post.director %></span><% } %>
+          <% if (post.rating) { %><span>MY RATE · <%= post.rating %></span><% } %>
+        </div>
+        <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+        <p><%= postSummary(post, 165) %></p>
+        <div class="movie-card-foot">
+          <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+          <a href="<%= url_for(post.path) %>">ENTER FRAME ↗</a>
+        </div>
+      </article>
+    <% }) %>
+  </section>
+
+<% } else if (page.category === '旅行') { %>
+  <section class="travel-category-hero">
+    <div class="shell travel-hero-grid">
+      <div>
+        <div class="travel-kicker">YERBERY / <%= meta.en %></div>
+        <h1>旅行</h1>
+        <p><%= meta.desc %></p>
+      </div>
+      <div class="travel-weather-card" aria-hidden="true">
+        <span class="travel-weather-sun"></span>
+        <strong>GO SOMEWHERE</strong>
+        <small>collect light · streets · stories</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="travel-list shell">
+    <% posts.forEach(function(post, i) {
+      var route = Array.isArray(post.route) ? post.route : [];
+    %>
+      <article class="travel-story-card">
+        <div class="travel-stamp">JOURNEY <%= String(i + 1).padStart(2, '0') %></div>
+        <div class="travel-story-main">
+          <div class="travel-story-meta">
+            <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+            <% if (post.season) { %><span><%= post.season %></span><% } %>
+            <% if (post.place) { %><span><%= post.place %></span><% } %>
+          </div>
+          <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+          <p><%= postSummary(post, 170) %></p>
+          <% if (route.length) { %>
+            <div class="travel-mini-route">
+              <% route.forEach(function(city, idx) { %>
+                <span><i></i><%= city %></span><% if (idx < route.length - 1) { %><b>→</b><% } %>
+              <% }) %>
+            </div>
+          <% } %>
+          <a class="travel-open" href="<%= url_for(post.path) %>">继续上路 →</a>
+        </div>
+      </article>
+    <% }) %>
+  </section>
+
+<% } else { %>
+  <section class="listing-hero shell narrow">
+    <div class="eyebrow"><%= meta.en %></div>
+    <h1><%= page.category %></h1>
+    <p><%= meta.desc %></p>
+  </section>
+  <section class="listing shell narrow">
+    <% posts.forEach(function(post) { %>
+      <article class="listing-item">
+        <div class="listing-date"><%= date(post.date, 'YYYY.MM.DD') %></div>
+        <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+        <p><%= postSummary(post, 150) %></p>
+        <a class="text-link" href="<%= url_for(post.path) %>">继续阅读 →</a>
+      </article>
+    <% }) %>
+  </section>
+<% } %>

@@ -1,0 +1,94 @@
+<%
+  function categoryNames() {
+    var names = [];
+    if (page.category) names.push(page.category);
+    if (page.categories && page.categories.each) {
+      page.categories.each(function(cat) { names.push(cat.name); });
+    }
+    return names;
+  }
+
+  function resolveRealm() {
+    var names = categoryNames();
+    var map = { '学习': 'study', '阅读': 'reading', '电影': 'movies', '旅行': 'travel' };
+    for (var i = 0; i < names.length; i++) {
+      if (map[names[i]]) return map[names[i]];
+    }
+    return page.layout === 'index' ? 'home' : 'default';
+  }
+
+  var realm = resolveRealm();
+  var readingType = page.reading_type || '';
+%>
+<!DOCTYPE html>
+<html lang="<%= config.language || 'zh-CN' %>" data-theme="light" data-realm="<%= realm %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f0">
+  <meta name="description" content="<%= page.description || page.excerpt || config.description || '' %>">
+  <title><%= page.title ? page.title + ' · ' : '' %><%= config.title %></title>
+  <%- css('css/yerbery.css') %>
+  <% if (realm === 'study') { %><%- css('css/study.css') %><% } %>
+  <% if (realm === 'reading') { %><%- css('css/reading.css') %><% } %>
+  <% if (realm === 'movies') { %><%- css('css/movies.css') %><% } %>
+  <% if (realm === 'travel') { %><%- css('css/travel.css') %><% } %>
+
+  <% if (realm === 'study') { %>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <% } %>
+</head>
+<body class="realm-<%= realm %><%= readingType ? ' reading-type-' + readingType : '' %>">
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <header class="site-header" id="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="<%= url_for('/') %>" aria-label="返回首页">
+        <span class="brand-mark">Y</span>
+        <span class="brand-name"><%= theme.brand || config.title %></span>
+      </a>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="打开菜单" aria-expanded="false">☰</button>
+
+      <nav class="site-nav" id="site-nav">
+        <% Object.keys(theme.menu || {}).forEach(function(name) { %>
+          <a href="<%= url_for(theme.menu[name]) %>"><%= name %></a>
+        <% }) %>
+      </nav>
+
+      <div class="nav-actions">
+        <% if (theme.github) { %>
+          <a class="nav-icon" href="<%= theme.github %>" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
+        <% } %>
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换深浅色">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <%- body %>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong><%= theme.brand || config.title %></strong>
+      <span> · <%= theme.footer_text || 'Personal Garden' %></span>
+    </div>
+    <div>© <span id="current-year"></span> <%= config.author || theme.brand %></div>
+  </footer>
+
+  <%- js('js/yerbery.js') %>
+</body>
+</html>

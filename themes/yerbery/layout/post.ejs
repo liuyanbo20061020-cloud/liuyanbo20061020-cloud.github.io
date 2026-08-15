@@ -1,0 +1,160 @@
+<%
+  var catNames = [];
+  if (page.categories && page.categories.each) {
+    page.categories.each(function(cat) { catNames.push(cat.name); });
+  }
+  var realm = catNames.indexOf('学习') !== -1 ? 'study' :
+              catNames.indexOf('阅读') !== -1 ? 'reading' :
+              catNames.indexOf('电影') !== -1 ? 'movies' :
+              catNames.indexOf('旅行') !== -1 ? 'travel' : 'default';
+  var readingTypes = theme.reading_types || {
+    mystery: '悬疑', fiction: '文学·小说', essay: '文学·散文&随笔', travelogue: '游阅', other: '其他'
+  };
+  var readingType = page.reading_type && readingTypes[page.reading_type] ? page.reading_type : 'other';
+  var route = Array.isArray(page.route) ? page.route : [];
+  var readMinutes = page.content ? Math.max(1, Math.ceil(String(page.content).replace(/<[^>]*>/g, '').length / 500)) : 1;
+%>
+
+<% if (realm === 'study') { %>
+  <article class="study-article">
+    <header class="study-article-header shell">
+      <div class="study-doc-id">YERBERY STUDY NOTE · <%= date(page.date, 'YYYYMMDD') %></div>
+      <h1><%= page.title %></h1>
+      <% if (page.subtitle) { %>
+        <div class="study-abstract"><span>ABSTRACT</span><p><%= page.subtitle %></p></div>
+      <% } %>
+      <div class="study-article-meta">
+        <span>Published <%= date(page.date, 'YYYY.MM.DD') %></span>
+        <span><%= readMinutes %> min read</span>
+        <% if (page.tags && page.tags.length) { %>
+          <span class="study-tagline"><% page.tags.each(function(tag) { %>#<%= tag.name %> <% }) %></span>
+        <% } %>
+      </div>
+    </header>
+
+    <div class="study-article-layout shell">
+      <aside class="study-toc" id="study-toc">
+        <div class="study-toc-title">CONTENTS</div>
+        <nav id="study-toc-list"></nav>
+      </aside>
+      <div class="article-content study-content" id="article-content">
+        <%- page.content %>
+      </div>
+    </div>
+
+    <% if (page.tags && page.tags.length) { %>
+      <div class="article-tags study-tags shell narrow">
+        <% page.tags.each(function(tag) { %><a href="<%= url_for(tag.path) %>"># <%= tag.name %></a><% }) %>
+      </div>
+    <% } %>
+  </article>
+
+<% } else if (realm === 'reading') { %>
+  <article class="reading-article reading-article-<%= readingType %>">
+    <header class="reading-article-header shell narrow">
+      <div class="reading-piece-label"><%= readingTypes[readingType] %> · READING NOTE</div>
+      <h1><%= page.title %></h1>
+      <% if (page.subtitle) { %><p class="reading-deck"><%= page.subtitle %></p><% } %>
+      <div class="reading-byline">
+        <span>Yerbery</span><i></i><time><%= date(page.date, 'YYYY年MM月DD日') %></time><i></i><span><%= readMinutes %> min read</span>
+      </div>
+      <div class="reading-flourish" aria-hidden="true">❦</div>
+    </header>
+
+    <div class="article-content reading-content shell narrow">
+      <%- page.content %>
+    </div>
+
+    <% if (page.tags && page.tags.length) { %>
+      <div class="article-tags reading-tags shell narrow">
+        <% page.tags.each(function(tag) { %><a href="<%= url_for(tag.path) %>"># <%= tag.name %></a><% }) %>
+      </div>
+    <% } %>
+  </article>
+
+<% } else if (realm === 'movies') { %>
+  <article class="movie-article">
+    <header class="movie-article-hero">
+      <div class="movie-horizon" aria-hidden="true"></div>
+      <div class="shell movie-article-head-inner">
+        <div class="movie-signal">YERBERY / CINEMA LOG</div>
+        <h1><%= page.title %></h1>
+        <% if (page.subtitle) { %><p class="movie-deck"><%= page.subtitle %></p><% } %>
+        <div class="movie-article-meta">
+          <% if (page.movie_year) { %><span><b>YEAR</b><%= page.movie_year %></span><% } %>
+          <% if (page.director) { %><span><b>DIRECTOR</b><%= page.director %></span><% } %>
+          <% if (page.rating) { %><span><b>MY RATE</b><%= page.rating %></span><% } %>
+          <span><b>LOGGED</b><%= date(page.date, 'YYYY.MM.DD') %></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="article-content movie-content shell narrow">
+      <%- page.content %>
+    </div>
+
+    <% if (page.tags && page.tags.length) { %>
+      <div class="article-tags movie-tags shell narrow">
+        <% page.tags.each(function(tag) { %><a href="<%= url_for(tag.path) %>"># <%= tag.name %></a><% }) %>
+      </div>
+    <% } %>
+  </article>
+
+<% } else if (realm === 'travel') { %>
+  <article class="travel-article">
+    <header class="travel-article-hero">
+      <div class="shell travel-article-head">
+        <div class="travel-kicker">YERBERY / TRAVEL JOURNAL</div>
+        <h1><%= page.title %></h1>
+        <% if (page.subtitle) { %><p class="travel-deck"><%= page.subtitle %></p><% } %>
+        <div class="travel-article-meta">
+          <time><%= date(page.date, 'YYYY年MM月DD日') %></time>
+          <% if (page.season) { %><span><%= page.season %></span><% } %>
+          <% if (page.place) { %><span><%= page.place %></span><% } %>
+        </div>
+        <% if (route.length) { %>
+          <div class="travel-route-line">
+            <% route.forEach(function(city, idx) { %>
+              <span class="travel-route-stop"><i></i><%= city %></span>
+              <% if (idx < route.length - 1) { %><b>→</b><% } %>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </header>
+
+    <div class="article-content travel-content shell narrow">
+      <%- page.content %>
+    </div>
+
+    <% if (page.tags && page.tags.length) { %>
+      <div class="article-tags travel-tags shell narrow">
+        <% page.tags.each(function(tag) { %><a href="<%= url_for(tag.path) %>"># <%= tag.name %></a><% }) %>
+      </div>
+    <% } %>
+  </article>
+
+<% } else { %>
+  <article class="article-shell">
+    <header class="article-header">
+      <div class="article-kicker">
+        <% if (page.categories && page.categories.length) { page.categories.each(function(cat) { %>
+          <a href="<%= url_for(cat.path) %>"><%= cat.name %></a>
+        <% }) } else { %><span>NOTE</span><% } %>
+      </div>
+      <h1><%= page.title %></h1>
+      <% if (page.subtitle) { %><p class="article-subtitle"><%= page.subtitle %></p><% } %>
+      <div class="article-meta"><time><%= date(page.date, 'YYYY年MM月DD日') %></time><span>·</span><span><%= readMinutes %> min read</span></div>
+    </header>
+    <div class="article-content"><%- page.content %></div>
+  </article>
+<% } %>
+
+<nav class="post-nav realm-post-nav shell narrow">
+  <div>
+    <% if (page.prev) { %><span>上一篇</span><a href="<%= url_for(page.prev.path) %>"><%= page.prev.title %></a><% } %>
+  </div>
+  <div class="post-nav-next">
+    <% if (page.next) { %><span>下一篇</span><a href="<%= url_for(page.next.path) %>"><%= page.next.title %></a><% } %>
+  </div>
+</nav>

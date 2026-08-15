@@ -1,0 +1,45 @@
+<article class="article-shell">
+  <header class="article-header">
+    <div class="article-kicker">
+      <% if (page.categories && page.categories.length) { page.categories.each(function(cat) { %>
+        <a href="<%= url_for(cat.path) %>"><%= cat.name %></a>
+      <% }) } else { %>
+        <span>NOTE</span>
+      <% } %>
+    </div>
+    <h1><%= page.title %></h1>
+    <% if (page.subtitle) { %><p class="article-subtitle"><%= page.subtitle %></p><% } %>
+    <div class="article-meta">
+      <time><%= date(page.date, 'YYYY年MM月DD日') %></time>
+      <span>·</span>
+      <span><%= page.content ? Math.max(1, Math.ceil(String(page.content).replace(/<[^>]*>/g, '').length / 500)) : 1 %> min read</span>
+    </div>
+  </header>
+
+  <div class="article-content">
+    <%- page.content %>
+  </div>
+
+  <% if (page.tags && page.tags.length) { %>
+    <div class="article-tags">
+      <% page.tags.each(function(tag) { %>
+        <a href="<%= url_for(tag.path) %>"># <%= tag.name %></a>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <nav class="post-nav">
+    <div>
+      <% if (page.prev) { %>
+        <span>上一篇</span>
+        <a href="<%= url_for(page.prev.path) %>"><%= page.prev.title %></a>
+      <% } %>
+    </div>
+    <div class="post-nav-next">
+      <% if (page.next) { %>
+        <span>下一篇</span>
+        <a href="<%= url_for(page.next.path) %>"><%= page.next.title %></a>
+      <% } %>
+    </div>
+  </nav>
+</article>

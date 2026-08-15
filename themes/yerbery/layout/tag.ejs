@@ -1,0 +1,20 @@
+<%
+  var posts = page.posts && page.posts.toArray ? page.posts.toArray() : [];
+  function plainText(html) { return String(html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); }
+%>
+<section class="listing-hero shell narrow">
+  <div class="eyebrow">TAG</div>
+  <h1># <%= page.tag %></h1>
+  <p>围绕同一个关键词，看看不同时间留下的记录。</p>
+</section>
+
+<section class="listing shell narrow">
+  <% posts.forEach(function(post) { var text = plainText(post.excerpt || post.content); %>
+    <article class="listing-item">
+      <div class="listing-date"><%= date(post.date, 'YYYY.MM.DD') %></div>
+      <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+      <p><%= text.length > 150 ? text.slice(0,150) + '…' : text %></p>
+      <a class="text-link" href="<%= url_for(post.path) %>">继续阅读 →</a>
+    </article>
+  <% }) %>
+</section>

@@ -1,0 +1,134 @@
+<%
+  function plainText(html) {
+    return String(html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function summary(post, len) {
+    var text = plainText(post.excerpt || post.content);
+    return text.length > len ? text.slice(0, len) + '…' : text;
+  }
+  var posts = page.posts && page.posts.toArray ? page.posts.toArray() : [];
+%>
+
+<section class="hero shell">
+  <div class="hero-copy">
+    <div class="eyebrow"><%= theme.kicker || 'PERSONAL GARDEN' %></div>
+    <h1><span>Yerbery</span><br>的个人花园</h1>
+    <p class="hero-motto"><%= theme.motto %></p>
+    <div class="hero-links">
+      <a class="btn btn-primary" href="#worlds">开始漫游</a>
+      <a class="btn btn-ghost" href="<%= url_for('/archives/') %>">查看归档</a>
+    </div>
+  </div>
+
+  <div class="hero-art" aria-hidden="true">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="hero-card">
+      <span>LEARN</span>
+      <span>READ</span>
+      <span>WATCH</span>
+      <span>WANDER</span>
+    </div>
+  </div>
+</section>
+
+<section class="section shell" id="worlds">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">FOUR WORLDS</div>
+      <h2>四个世界，各有自己的气候</h2>
+    </div>
+    <p>学习保持严谨，阅读保留余韵，电影负责仰望银幕，旅行则把阳光和路途一起收进来。</p>
+  </div>
+
+  <div class="world-grid world-grid-v2">
+    <a class="world-card world-study" href="<%= url_for('/categories/study/') %>">
+      <span class="world-no">01 / ACADEMIC</span>
+      <div class="world-study-visual" aria-hidden="true">
+        <span class="study-bracket">{ }</span>
+        <span class="study-formula">T(n) = O(n log n)</span>
+        <span class="study-cursor"></span>
+      </div>
+      <div class="world-copy">
+        <h3>学习</h3><p>Learning</p>
+        <span class="world-desc">CS · Notes · Proof · System</span>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+
+    <a class="world-card world-reading" href="<%= url_for('/categories/reading/') %>">
+      <span class="world-no">02 / READING ROOM</span>
+      <div class="world-reading-visual" aria-hidden="true">
+        <span class="paper paper-a"></span>
+        <span class="paper paper-b"></span>
+        <span class="reading-quote">“</span>
+      </div>
+      <div class="world-copy">
+        <h3>阅读</h3><p>Reading</p>
+        <span class="world-desc">悬疑 · 小说 · 随笔 · 游阅</span>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+
+    <a class="world-card world-movies" href="<%= url_for('/categories/movies/') %>">
+      <span class="world-no">03 / CINEMA</span>
+      <div class="world-movie-visual" aria-hidden="true">
+        <span class="movie-orbit"></span>
+        <span class="movie-star star-a"></span>
+        <span class="movie-star star-b"></span>
+        <span class="movie-frame">24 FPS</span>
+      </div>
+      <div class="world-copy">
+        <h3>电影</h3><p>Movies</p>
+        <span class="world-desc">Frame · Memory · Emotion</span>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+
+    <a class="world-card world-travel" href="<%= url_for('/categories/travel/') %>">
+      <span class="world-no">04 / WANDER</span>
+      <div class="world-travel-visual" aria-hidden="true">
+        <span class="travel-sun"></span>
+        <span class="travel-route route-a"></span>
+        <span class="travel-dot dot-a"></span>
+        <span class="travel-dot dot-b"></span>
+      </div>
+      <div class="world-copy">
+        <h3>旅行</h3><p>Travel</p>
+        <span class="world-desc">City · Route · Photo · Summer</span>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="section-head compact">
+    <div>
+      <div class="eyebrow">RECENT NOTES</div>
+      <h2>最近写下</h2>
+    </div>
+    <a class="text-link" href="<%= url_for('/archives/') %>">全部文章 →</a>
+  </div>
+
+  <div class="post-grid">
+    <% posts.slice(0, 6).forEach(function(post, i) { %>
+      <article class="post-card">
+        <div class="post-card-top">
+          <span class="post-index"><%= String(i + 1).padStart(2, '0') %></span>
+          <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+        </div>
+        <h3><a href="<%= url_for(post.path) %>"><%= post.title %></a></h3>
+        <p><%= summary(post, 96) %></p>
+        <div class="post-card-bottom">
+          <div class="chips">
+            <% if (post.categories && post.categories.length) { post.categories.each(function(cat) { %>
+              <a href="<%= url_for(cat.path) %>"><%= cat.name %></a>
+            <% }) } %>
+          </div>
+          <a class="read-more" href="<%= url_for(post.path) %>">阅读 ↗</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
